@@ -1,6 +1,6 @@
 package com.ferdsapp.jetmoviesapp.repository
 
-import com.ferdsapp.jetmoviesapp.data.ResultItem
+import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.utils.ApiResponse
 import com.ferdsapp.jetmoviesapp.source.RemoteDataSource
 import kotlinx.coroutines.flow.Flow

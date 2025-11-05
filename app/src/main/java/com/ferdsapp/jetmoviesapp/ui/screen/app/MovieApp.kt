@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ferdsapp.jetmoviesapp.ui.navigation.Screen
 import com.ferdsapp.jetmoviesapp.ui.screen.components.BottomBar
+import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieTopAppBar
 import com.ferdsapp.jetmoviesapp.ui.screen.favorite.FavoriteScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.home.HomeScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.search.SearchScreen
@@ -25,6 +26,9 @@ fun MovieApp(
     Scaffold(
         bottomBar = {
             BottomBar(navController = navController)
+        },
+        topBar = {
+            MovieTopAppBar()
         },
         modifier = modifier,
         containerColor = Color.White,

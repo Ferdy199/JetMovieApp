@@ -1,4 +1,4 @@
-package com.ferdsapp.jetmoviesapp.data
+package com.ferdsapp.jetmoviesapp.data.movie
 
 import com.google.gson.annotations.SerializedName
 

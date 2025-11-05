@@ -1,14 +1,12 @@
 package com.ferdsapp.jetmoviesapp.source
 
-import com.ferdsapp.jetmoviesapp.data.MovieNowPlayingResponses
-import com.ferdsapp.jetmoviesapp.data.ResultItem
+import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.utils.ApiResponse
 import com.ferdsapp.jetmoviesapp.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okhttp3.Dispatcher
 import javax.inject.Inject
 import javax.inject.Singleton
 
