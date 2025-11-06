@@ -1,6 +1,8 @@
 package com.ferdsapp.jetmoviesapp.source
 
+import com.ferdsapp.jetmoviesapp.BuildConfig
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
+import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
 import com.ferdsapp.jetmoviesapp.data.utils.ApiResponse
 import com.ferdsapp.jetmoviesapp.network.ApiService
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +20,7 @@ class RemoteDataSource @Inject constructor (
         return flow {
             emit(ApiResponse.Loading)
             try {
-                val token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjVkN2YwZjc5ZGE0MGFmYjc2NDkzZmJjZTIyNzg1ZSIsIm5iZiI6MTczMDU1NTIwNC41NDI5MzMyLCJzdWIiOiI2MGM5YTM3ODJmY2NlZTAwMjhhMTgzMWUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.wcg8J1BRGikoAzUq_Q6wYgxKuPTgXw0MgJOSvuBdt94"
+                val token = BuildConfig.API_TOKEN
                 val responses = apiService.getNowPlayingMovie(
                     authToken = "Bearer $token"
                 )
@@ -30,5 +32,23 @@ class RemoteDataSource @Inject constructor (
                 emit(ApiResponse.Error(e.toString()))
             }
         }.flowOn(Dispatchers.IO)
+    }
+
+    fun getTvAiringToday(): Flow<ApiResponse<List<TvResultItem>>>{
+        return flow {
+            emit(ApiResponse.Loading)
+            try {
+                val token = BuildConfig.API_TOKEN
+                val responses = apiService.getTvAiringToday(
+                    authToken = "Bearer $token"
+                )
+                val dataResponses = responses.results
+
+                emit(ApiResponse.Success(dataResponses))
+
+            }catch (e: Exception){
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+        }
     }
 }

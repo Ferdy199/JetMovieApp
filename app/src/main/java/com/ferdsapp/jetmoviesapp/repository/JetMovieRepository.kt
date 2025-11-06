@@ -1,6 +1,7 @@
 package com.ferdsapp.jetmoviesapp.repository
 
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
+import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
 import com.ferdsapp.jetmoviesapp.data.utils.ApiResponse
 import com.ferdsapp.jetmoviesapp.source.RemoteDataSource
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,16 @@ class JetMovieRepository @Inject constructor(
                 }
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message.toString()))
+            }
+        }
+    }
+
+    override fun getTvAiringToday(): Flow<ApiResponse<List<TvResultItem>>> {
+        return flow {
+            try {
+
+            }catch (e: Exception){
+
             }
         }
     }

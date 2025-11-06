@@ -40,4 +40,23 @@ class HomeViewModel @Inject constructor(private val repository: IMovieRepository
                 }
         }
     }
+
+    fun getTvAiringPlaying(){
+        viewModelScope.launch {
+            repository.getTvAiringToday().collect { tvAiringResponses ->
+                when(tvAiringResponses){
+                    is ApiResponse.Empty -> {}
+                    is ApiResponse.Error -> {
+                        _uiState.value = UiState.Error(tvAiringResponses.errorMessage)
+                    }
+                    is ApiResponse.Loading -> {
+                        _uiState.value = UiState.Loading
+                    }
+                    is ApiResponse.Success -> {
+                        _uiState.value = UiState.Success(tvAiringResponses.data)
+                    }
+                }
+            }
+        }
+    }
 }
