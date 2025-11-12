@@ -36,9 +36,18 @@ class JetMovieRepository @Inject constructor(
     override fun getTvAiringToday(): Flow<ApiResponse<List<TvResultItem>>> {
         return flow {
             try {
-
+                remoteDataSource.getTvAiringToday().collect { getTvAiringResponses ->
+                    when(getTvAiringResponses){
+                        is ApiResponse.Empty -> emit(ApiResponse.Empty)
+                        is ApiResponse.Error -> emit(ApiResponse.Error(getTvAiringResponses.errorMessage))
+                        is ApiResponse.Loading -> emit(ApiResponse.Loading)
+                        is ApiResponse.Success -> {
+                            emit(ApiResponse.Success(getTvAiringResponses.data))
+                        }
+                    }
+                }
             }catch (e: Exception){
-
+                emit(ApiResponse.Error(errorMessage = e.toString()))
             }
         }
     }
