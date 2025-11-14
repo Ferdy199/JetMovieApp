@@ -2,6 +2,7 @@ package com.ferdsapp.jetmoviesapp.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ferdsapp.jetmoviesapp.helper.UiStateHelper.asUiState
 import com.ferdsapp.jetmoviesapp.helper.UiStateHelper.asUiStateList
 import com.ferdsapp.jetmoviesapp.repository.IMovieRepository
 import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
@@ -24,6 +25,14 @@ class HomeViewModel @Inject constructor(private val repository: IMovieRepository
 
     val tvUiState = repository.getTvAiringToday()
         .asUiStateList()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UiState.Loading
+        )
+
+    val upComingState = repository.getUpcomingMovie()
+        .asUiState()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

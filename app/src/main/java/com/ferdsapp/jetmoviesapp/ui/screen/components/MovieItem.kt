@@ -1,10 +1,7 @@
 package com.ferdsapp.jetmoviesapp.ui.screen.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,43 +26,37 @@ fun MovieItem(
     movieItem: ResultItem? = null,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.width(140.dp),
-        shape = RoundedCornerShape(8.dp),
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.padding(top = 8.dp)
+            .width(140.dp)
     ) {
-        Column {
-            Box{
-                AsyncImage(
-                    model = "https://image.tmdb.org/t/p/w500" + movieItem?.backdrop_path,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .aspectRatio(2f / 3f)
-                )
-                Column(
-                    modifier = Modifier.align(Alignment.BottomStart)
-                        .fillMaxWidth()
-                        .background(Color.White)
-                    ,
-                ) {
-                    Text(
-                        text = movieItem?.title ?: "-",
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-                    )
-                }
-
-            }
-
+        Card(
+            modifier = modifier.width(140.dp),
+            shape = RoundedCornerShape(8.dp),
+        ) {
+            AsyncImage(
+                model = "https://image.tmdb.org/t/p/w500" + movieItem?.backdrop_path,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier
+                    .aspectRatio(2f / 3f)
+            )
         }
+
+        Text(
+            text = movieItem?.title ?: "-",
+            fontSize = 14.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+        )
     }
 }
 
-@Preview(showBackground = true, widthDp = 200, heightDp = 320)
+@Preview(showBackground = true)
 @Composable
 private fun MovieItemPreview() {
     MaterialTheme {

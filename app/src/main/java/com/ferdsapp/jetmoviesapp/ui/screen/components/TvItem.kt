@@ -29,41 +29,36 @@ fun TvItem(
     tvItem: TvResultItem? = null,
     modifier: Modifier = Modifier,
     ) {
-    Card(
-        modifier = modifier.width(140.dp),
-        shape = RoundedCornerShape(8.dp),
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier.padding(top = 8.dp)
+            .width(140.dp)
     ) {
-        Column(modifier = Modifier) {
-            Box(modifier = Modifier) {
-                AsyncImage(
-                    model = "https://image.tmdb.org/t/p/w500" + tvItem?.poster_path,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .aspectRatio(2f / 3f)
-                )
-                Column(
-                    modifier = Modifier.align(Alignment.BottomStart)
-                        .fillMaxWidth()
-                        .background(Color.White)
-                    ,
-                ) {
-                    Text(
-                        text = tvItem?.original_name ?: "-",
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-                    )
-                }
-            }
+        Card (
+            modifier = modifier.width(140.dp),
+            shape = RoundedCornerShape(8.dp),
+        ) {
+            AsyncImage(
+                model = "https://image.tmdb.org/t/p/w500" + tvItem?.poster_path,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier
+                    .aspectRatio(2f / 3f)
+            )
         }
+        Text(
+            text = tvItem?.original_name ?: "-",
+            fontSize = 14.sp,
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+        )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TvItemPreview() {
     JetMoviesAppTheme {

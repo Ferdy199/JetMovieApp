@@ -17,4 +17,14 @@ object UiStateHelper {
                 is ApiResponse.Error   -> UiState.Error(res.errorMessage)
             }
         }.onStart { emit(UiState.Loading) }
+
+    fun <T> Flow<ApiResponse<T>>.asUiState(): Flow<UiState<T>> =
+        map { res ->
+            when (res) {
+                is ApiResponse.Loading -> UiState.Loading
+                is ApiResponse.Success -> UiState.Success(res.data)
+                is ApiResponse.Empty   -> UiState.Error(res.toString())
+                is ApiResponse.Error   -> UiState.Error(res.errorMessage)
+            }
+        }.onStart { emit(UiState.Loading) }
 }
