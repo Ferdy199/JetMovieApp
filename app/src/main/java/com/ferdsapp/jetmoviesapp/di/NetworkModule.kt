@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.di
 
+import com.ferdsapp.jetmoviesapp.BuildConfig
 import com.ferdsapp.jetmoviesapp.network.ApiService
 import dagger.Module
 import dagger.Provides
@@ -26,7 +27,7 @@ class NetworkModule {
     @Provides
     fun provideApiService(): ApiService {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.themoviedb.org/")
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(provideOkhttpClient())
             .build()

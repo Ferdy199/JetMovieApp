@@ -1,4 +1,4 @@
-package com.ferdsapp.jetmoviesapp.ui.screen.home
+package com.ferdsapp.jetmoviesapp.ui.screen.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,27 +11,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: IMovieRepository): ViewModel() {
-
-    val movieUiState = repository.getNowMoviePlaying()
-        .asUiStateList()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = UiState.Loading
-        )
-
-    val tvUiState = repository.getTvAiringToday()
-        .asUiStateList()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = UiState.Loading
-        )
-
-    val upComingState = repository.getUpcomingMovie()
+class SearchViewModel @Inject constructor(val repository: IMovieRepository): ViewModel() {
+    fun searchState(query: String) = repository.getSearchResponses(query)
         .asUiState()
         .stateIn(
             scope = viewModelScope,

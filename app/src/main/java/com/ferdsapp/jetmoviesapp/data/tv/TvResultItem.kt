@@ -13,5 +13,8 @@ data class TvResultItem(
     var overview: String = "",
 
     @SerializedName("original_name")
-    var original_name: String = ""
+    var original_name: String = "",
+
+    @field:SerializedName("id")
+    var id: Int,
 )

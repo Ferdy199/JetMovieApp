@@ -2,7 +2,9 @@ package com.ferdsapp.jetmoviesapp.source
 
 import com.ferdsapp.jetmoviesapp.BuildConfig
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
+import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
+import com.ferdsapp.jetmoviesapp.data.upcoming.UpcomingResponses
 import com.ferdsapp.jetmoviesapp.data.utils.ApiResponse
 import com.ferdsapp.jetmoviesapp.network.ApiService
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +50,34 @@ class RemoteDataSource @Inject constructor (
 
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message.toString()))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun getUpcomingMovie(): Flow<ApiResponse<UpcomingResponses>>{
+        return flow {
+            emit(ApiResponse.Loading)
+            try {
+                val token = BuildConfig.API_TOKEN
+                val responses = apiService.getUpcomingMovie(
+                    authToken = "Bearer $token"
+                )
+                emit(ApiResponse.Success(responses))
+            }catch (e: Exception){
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun getSearchFeatures(query: String): Flow<ApiResponse<SearchResponses>>{
+        return flow {
+            emit(ApiResponse.Loading)
+            try {
+                val token = BuildConfig.API_TOKEN
+                val responses  = apiService.getSearchFeatures(token, query = query)
+                emit(ApiResponse.Success(responses))
+            }catch (e: Exception){
+                emit(ApiResponse.Error(e.message ?: "Unexpected error"))
             }
         }
     }
