@@ -22,13 +22,18 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBarApp(query: String, modifier: Modifier = Modifier) {
+fun SearchBarApp(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     SearchBar(
         inputField = {
             InputField(
                 query = query,
-                onQueryChange = {},
-                onSearch = {},
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
                 expanded = false,
                 onExpandedChange = {},
                 leadingIcon = {
@@ -58,6 +63,10 @@ fun SearchBarApp(query: String, modifier: Modifier = Modifier) {
 @Composable
 private fun SearchBarAppPreview() {
     JetMoviesAppTheme {
-        SearchBarApp()
+        SearchBarApp(
+            query = "",
+            onQueryChange = {},
+            onSearch = {}
+        )
     }
 }

@@ -90,14 +90,7 @@ fun NowPlayingSection(
 ) {
     when(state){
         is UiState.Error -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Failed get data"
-                )
-            }
+            ErrorDialog(modifier)
         }
         UiState.Loading -> {}
         is UiState.Success -> {
@@ -112,6 +105,8 @@ fun NowPlayingSection(
                 }
             }
         }
+
+        UiState.Empty -> ErrorDialog()
     }
 }
 
@@ -122,14 +117,7 @@ fun NowAiringSection(
 ) {
     when(state){
         is UiState.Error -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Failed get data"
-                )
-            }
+            ErrorDialog(modifier)
         }
         is UiState.Loading -> {}
         is UiState.Success -> {
@@ -144,6 +132,8 @@ fun NowAiringSection(
                 }
             }
         }
+
+        UiState.Empty -> ErrorDialog()
     }
 }
 
@@ -179,5 +169,7 @@ fun UpcomingMovieSection(
                 }
             }
         }
+
+        UiState.Empty -> ErrorDialog()
     }
 }

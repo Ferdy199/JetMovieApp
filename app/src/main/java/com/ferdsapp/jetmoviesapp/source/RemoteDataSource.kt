@@ -74,7 +74,7 @@ class RemoteDataSource @Inject constructor (
             emit(ApiResponse.Loading)
             try {
                 val token = BuildConfig.API_TOKEN
-                val responses  = apiService.getSearchFeatures(token, query = query)
+                val responses  = apiService.getSearchFeatures("Bearer $token", query = query)
                 emit(ApiResponse.Success(responses))
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message ?: "Unexpected error"))
