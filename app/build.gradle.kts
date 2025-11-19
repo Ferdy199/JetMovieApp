@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    id("kotlin-parcelize")
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -36,6 +39,11 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    defaultConfig{
+        buildConfigField("String", "API_TOKEN", "'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjVkN2YwZjc5ZGE0MGFmYjc2NDkzZmJjZTIyNzg1ZSIsIm5iZiI6MTczMDU1NTIwNC41NDI5MzMyLCJzdWIiOiI2MGM5YTM3ODJmY2NlZTAwMjhhMTgzMWUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.wcg8J1BRGikoAzUq_Q6wYgxKuPTgXw0MgJOSvuBdt94'")
+        buildConfigField("String", "BASE_URL", "'https://api.themoviedb.org/'")
     }
 }
 
@@ -49,6 +57,20 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.logging.interceptor)
+    ksp (libs.hilt.android.compiler)
+    implementation (libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
