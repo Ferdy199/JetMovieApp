@@ -22,11 +22,11 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBarApp(modifier: Modifier = Modifier) {
+fun SearchBarApp(query: String, modifier: Modifier = Modifier) {
     SearchBar(
         inputField = {
             InputField(
-                query = "",
+                query = query,
                 onQueryChange = {},
                 onSearch = {},
                 expanded = false,

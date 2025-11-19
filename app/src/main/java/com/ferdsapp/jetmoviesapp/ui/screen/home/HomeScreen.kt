@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -53,31 +55,20 @@ fun HomeScreen(
         }
     }
 
-    val listState = rememberLazyListState()
-
     Box(
         modifier = Modifier
     ) {
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            item{
-                NowPlayingSection(movieState, modifier = modifier)
-            }
-
-            item {
-                NowAiringSection(state = tvState, modifier = modifier)
-            }
-
-            item {
-                UpcomingMovieSection(state = upcomingState, modifier = modifier)
-            }
-        }
-
         if (isLoading.value){
             LoadingDialog()
+        }
+
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+            NowPlayingSection(movieState, modifier = modifier)
+            NowAiringSection(state = tvState, modifier = modifier)
+            UpcomingMovieSection(state = upcomingState, modifier = modifier)
         }
 
     }
