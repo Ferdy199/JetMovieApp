@@ -9,7 +9,6 @@ import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,33 +17,21 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(val repository: IMovieRepository): ViewModel() {
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
-    fun searchNowState(query: String): Flow<UiState<SearchResponses>> {
-        _query.value = query
-        return repository.getSearchResponses(_query.value)
-            .asUiState()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = UiState.Loading
-            )
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun searchState(query: String): StateFlow<UiState<SearchResponses>>{
-        _query.value = query
+    fun searchState1(): StateFlow<UiState<SearchResponses>>{
         return _query
             .debounce(300)
             .distinctUntilChanged()
             .flatMapLatest { query ->
-                if (query.isBlank() || query.isNullOrEmpty()){
+                if (query.isBlank() || query.isEmpty()){
                     flow {
                         emit(UiState.Empty)
                     }
@@ -55,7 +42,37 @@ class SearchViewModel @Inject constructor(val repository: IMovieRepository): Vie
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = UiState.Loading
+                initialValue = UiState.Empty
             )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchState2: StateFlow<UiState<SearchResponses>> = _query
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            if (query.isBlank()) {
+                flow {
+                    emit(UiState.Empty)
+                }
+            } else {
+                repository.getSearchResponses(query).asUiState()
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = UiState.Empty
+        )
+
+
+    // dipanggil oleh UI saat user ketik
+    fun onQueryChanged(query: String) {
+        _query.value = query
+    }
+
+    // dipanggil saat user tekan search; set query supaya flatMapLatest langsung jalan
+    fun searchNow(query: String) {
+        _query.value = query
     }
 }

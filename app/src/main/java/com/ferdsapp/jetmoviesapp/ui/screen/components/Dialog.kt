@@ -48,3 +48,15 @@ private fun ErrorDialogPreview() {
         ErrorDialog()
     }
 }
+
+@Composable
+fun EmptyDialog(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Search is Empty"
+        )
+    }
+}
