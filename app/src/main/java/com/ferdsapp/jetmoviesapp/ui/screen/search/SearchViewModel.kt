@@ -26,36 +26,33 @@ import kotlin.collections.emptyList
 class SearchViewModel @Inject constructor(val repository: IMovieRepository): ViewModel() {
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
-    fun searchNowState(query: String): Flow<UiState<SearchResponses>> {
-        _query.value = query
-        return repository.getSearchResponses(_query.value)
-            .asUiState()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = UiState.Loading
-            )
-    }
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    fun searchState(query: String): StateFlow<UiState<SearchResponses>>{
-        _query.value = query
-        return _query
-            .debounce(300)
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val searchState: StateFlow<UiState<SearchResponses>> =
+        _query.debounce(300)
             .distinctUntilChanged()
             .flatMapLatest { query ->
-                if (query.isBlank() || query.isNullOrEmpty()){
+                if (query.isBlank() || query.isEmpty()){
                     flow {
                         emit(UiState.Empty)
                     }
                 }else{
-                    repository.getSearchResponses(query).asUiState()
+                    repository.getSearchResponses(query = query).asUiState()
                 }
             }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = UiState.Loading
+                initialValue = UiState.Empty
             )
+
+    fun onQueryChanged(newQuery: String) {
+        _query.value = newQuery
     }
+
+    fun searchNow(query: String){
+        _query.value = query
+    }
+
 }

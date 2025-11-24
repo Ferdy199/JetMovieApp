@@ -31,7 +31,7 @@ fun MovieApp(
             MovieTopAppBar()
         },
         modifier = modifier,
-        containerColor = Color.LightGray,
+        containerColor = Color.White,
     ) { innerPadding ->
         NavHost(
             navController = navController,

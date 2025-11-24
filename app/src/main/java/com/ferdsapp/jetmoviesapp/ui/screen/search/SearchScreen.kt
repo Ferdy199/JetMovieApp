@@ -2,17 +2,24 @@ package com.ferdsapp.jetmoviesapp.ui.screen.search
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
+import com.ferdsapp.jetmoviesapp.ui.screen.components.EmptyDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.ErrorDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.LoadingDialog
+import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieItem
 import com.ferdsapp.jetmoviesapp.ui.screen.components.SearchBarApp
 import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
@@ -26,23 +33,42 @@ fun SearchScreen(
         modifier = modifier,
     ) {
         val query by viewModel.query.collectAsStateWithLifecycle()
-        val state by viewModel.searchState(query).collectAsStateWithLifecycle()
+        val state by viewModel.searchState.collectAsStateWithLifecycle()
 
         SearchBarApp(
             query = query,
             onQueryChange = {
-                viewModel.searchState(it)
+                viewModel.onQueryChanged(it)
             },
-            onSearch = viewModel::searchNowState
+            onSearch = {
+                viewModel.searchNow(it)
+            }
         )
 
         when(state){
-            is UiState.Empty -> ErrorDialog()
-            is UiState.Error -> ErrorDialog()
+            is UiState.Empty -> {
+                EmptyDialog()
+            }
+            is UiState.Error -> {
+                ErrorDialog()
+            }
             is UiState.Loading -> LoadingDialog()
             is UiState.Success-> {
                 val searchResponses = (state as UiState.Success<SearchResponses>).data
                 Log.d("SearchResult", "SearchScreen: ${searchResponses.results}")
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier
+                ) {
+                    items(searchResponses.results, key = {it.id}) { searchResponses ->
+                        MovieItem(
+                            backdrop_path = searchResponses.poster_path,
+                            title = searchResponses.original_title ?: searchResponses.name ?: searchResponses.original_name ?: "-"
+                        )
+                    }
+                }
             }
         }
     }

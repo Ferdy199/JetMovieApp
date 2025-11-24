@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +30,6 @@ import com.ferdsapp.jetmoviesapp.ui.screen.components.ErrorDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.LoadingDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieItem
 import com.ferdsapp.jetmoviesapp.ui.screen.components.SectionText
-import com.ferdsapp.jetmoviesapp.ui.screen.components.TvItem
 import com.ferdsapp.jetmoviesapp.ui.screen.components.UpComingItem
 import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
@@ -101,7 +97,10 @@ fun NowPlayingSection(
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 items(data, key =  {it.id}) { movie ->
-                    MovieItem(movieItem = movie)
+                    MovieItem(
+                        backdrop_path = movie.backdrop_path ?: "",
+                        title = movie.title
+                    )
                 }
             }
         }
@@ -128,7 +127,10 @@ fun NowAiringSection(
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 items(data, key =  {it.id}) { tv ->
-                    TvItem(tvItem = tv)
+                    MovieItem(
+                        backdrop_path = tv.poster_path,
+                        title = tv.original_name
+                    )
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.ui.screen.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarDefaults.InputField
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,9 +33,14 @@ fun SearchBarApp(
     SearchBar(
         inputField = {
             InputField(
+                colors = SearchBarDefaults.inputFieldColors(
+                    focusedTextColor = Color.Black
+                ),
                 query = query,
                 onQueryChange = onQueryChange,
-                onSearch = onSearch,
+                onSearch = {
+                    onSearch(query)
+                },
                 expanded = false,
                 onExpandedChange = {},
                 leadingIcon = {
@@ -45,17 +52,18 @@ fun SearchBarApp(
                 },
                 placeholder = {
                     Text("Find Your Favorite Here")
-                }
+                },
+                modifier = Modifier.border(width = 1.dp, color = Color.Black, ShapeDefaults.Large)
             )
         },
         expanded = false,
         onExpandedChange = {},
-        shape = ShapeDefaults.Large,
         colors = SearchBarDefaults.colors(containerColor = Color.White),
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
             .padding(horizontal = 16.dp)
+
     ) { }
 }
 
