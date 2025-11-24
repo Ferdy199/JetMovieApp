@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.network
 
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.MovieNowPlayingResponses
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponsesItem
@@ -8,6 +9,7 @@ import com.ferdsapp.jetmoviesapp.data.upcoming.UpcomingResponses
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -61,4 +63,16 @@ interface ApiService {
 
         @Query("region") region: String = "id"
     ): SearchResponses
+
+    @GET("3/movie/{id}")
+    suspend fun getMovieDetail(
+        @Header("Authorization")
+        authToken: String,
+
+        @Path("id")
+        id: Int,
+
+        @Query("language")
+        language: String = "en-US"
+    ): MovieDetailResponse
 }

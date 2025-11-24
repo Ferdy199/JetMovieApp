@@ -1,6 +1,7 @@
 package com.ferdsapp.jetmoviesapp.source
 
 import com.ferdsapp.jetmoviesapp.BuildConfig
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
@@ -81,6 +82,19 @@ class RemoteDataSource @Inject constructor (
                     emit(ApiResponse.Empty)
                 }
 
+            }catch (e: Exception){
+                emit(ApiResponse.Error(e.message ?: "Unexpected error"))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun movieDetail(idMovie: Int): Flow<ApiResponse<MovieDetailResponse>>{
+        return flow {
+            emit(ApiResponse.Loading)
+            try {
+                val token = BuildConfig.API_TOKEN
+                val responses = apiService.getMovieDetail(token, idMovie)
+                emit(ApiResponse.Success(responses))
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message ?: "Unexpected error"))
             }
