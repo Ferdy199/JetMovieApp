@@ -2,6 +2,7 @@ package com.ferdsapp.jetmoviesapp.ui.screen.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -31,11 +32,11 @@ fun MovieItem(
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = modifier.padding(top = 8.dp)
             .widthIn(min = 110.dp, max = 120.dp)
     ) {
         Card(
-            modifier = Modifier.widthIn(min = 110.dp, max = 120.dp),
+            modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(8.dp),
         ) {
             AsyncImage(

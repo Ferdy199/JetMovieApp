@@ -7,12 +7,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.ferdsapp.jetmoviesapp.ui.navigation.Screen
 import com.ferdsapp.jetmoviesapp.ui.screen.components.BottomBar
 import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieTopAppBar
+import com.ferdsapp.jetmoviesapp.ui.screen.detail.DetailScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.favorite.FavoriteScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.home.HomeScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.search.SearchScreen
@@ -39,7 +42,11 @@ fun MovieApp(
             modifier = Modifier.padding(innerPadding)
         ){
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(
+                    navigateToDetail = { movieId ->
+                        navController.navigate(Screen.DetailMovie.createRoute(movieId))
+                    }
+                )
             }
 
             composable(Screen.Search.route){
@@ -48,6 +55,21 @@ fun MovieApp(
 
             composable(Screen.Favorite.route){
                 FavoriteScreen()
+            }
+            composable(
+                route = Screen.DetailMovie.route,
+                arguments = listOf(
+                    navArgument("movieId") {type = NavType.IntType},
+                    navArgument("movieOverview"){type = NavType.StringType},
+                    navArgument("movieTitle"){type = NavType.StringType},
+                    navArgument("moviePoster"){type = NavType.StringType},
+                    navArgument("movieBackground"){type = NavType.StringType}
+                    )
+            ){
+                val id = it.arguments?.getInt("movieId") ?: -1
+                DetailScreen(
+                    movieId = id
+                )
             }
         }
     }

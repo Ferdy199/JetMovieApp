@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.ui.screen.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,8 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    navigateToDetail: (Int) -> Unit
     ) {
 
 
@@ -62,7 +64,11 @@ fun HomeScreen(
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-            NowPlayingSection(movieState, modifier = modifier)
+            NowPlayingSection(
+                movieState,
+                modifier = modifier,
+                navigateToDetail = navigateToDetail
+            )
             NowAiringSection(state = tvState, modifier = modifier)
             UpcomingMovieSection(state = upcomingState, modifier = modifier)
         }
@@ -75,14 +81,15 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     JetMoviesAppTheme {
-        HomeScreen()
+        HomeScreen(navigateToDetail = {})
     }
 }
 
 @Composable
 fun NowPlayingSection(
     state:  UiState<List<ResultItem>>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Int) -> Unit
 ) {
     when(state){
         is UiState.Error -> {
@@ -99,7 +106,10 @@ fun NowPlayingSection(
                 items(data, key =  {it.id}) { movie ->
                     MovieItem(
                         backdrop_path = movie.backdrop_path ?: "",
-                        title = movie.title
+                        title = movie.title,
+                        modifier = Modifier.clickable {
+                            navigateToDetail(movie.id)
+                        }
                     )
                 }
             }
