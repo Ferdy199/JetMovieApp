@@ -64,10 +64,13 @@ interface ApiService {
         @Query("region") region: String = "id"
     ): SearchResponses
 
-    @GET("3/movie/{id}")
+    @GET("3/{media_type}/{id}")
     suspend fun getMovieDetail(
         @Header("Authorization")
         authToken: String,
+
+        @Path("media_type")
+        mediaType: String,
 
         @Path("id")
         id: Int,

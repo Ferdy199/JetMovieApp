@@ -14,5 +14,5 @@ interface IMovieRepository {
     fun getTvAiringToday(): Flow<ApiResponse<List<TvResultItem>>>
     fun getUpcomingMovie(): Flow<ApiResponse<UpcomingResponses>>
     fun getSearchResponses(query: String): Flow<ApiResponse<SearchResponses>>
-    fun getMovieDetail(movieId: Int): Flow<ApiResponse<MovieDetailResponse>>
+    fun getMovieDetail(media_type: String, movieId: Int): Flow<ApiResponse<MovieDetailResponse>>
 }

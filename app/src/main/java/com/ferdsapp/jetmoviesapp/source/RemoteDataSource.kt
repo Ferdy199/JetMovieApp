@@ -88,12 +88,16 @@ class RemoteDataSource @Inject constructor (
         }.flowOn(Dispatchers.IO)
     }
 
-    fun movieDetail(idMovie: Int): Flow<ApiResponse<MovieDetailResponse>>{
+    fun movieDetail(media_type: String,idMovie: Int): Flow<ApiResponse<MovieDetailResponse>>{
         return flow {
             emit(ApiResponse.Loading)
             try {
                 val token = BuildConfig.API_TOKEN
-                val responses = apiService.getMovieDetail("Bearer $token", idMovie)
+                val responses = apiService.getMovieDetail(
+                    "Bearer $token",
+                    media_type,
+                    idMovie
+                )
                 emit(ApiResponse.Success(responses))
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message ?: "Unexpected error"))

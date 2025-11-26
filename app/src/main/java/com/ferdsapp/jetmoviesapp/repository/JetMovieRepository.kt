@@ -94,10 +94,10 @@ class JetMovieRepository @Inject constructor(
         }
     }
 
-    override fun getMovieDetail(movieId: Int): Flow<ApiResponse<MovieDetailResponse>> {
+    override fun getMovieDetail(media_type: String, movieId: Int): Flow<ApiResponse<MovieDetailResponse>> {
         return flow {
             try {
-                remoteDataSource.movieDetail(movieId).collect { detailResponse ->
+                remoteDataSource.movieDetail(media_type,movieId).collect { detailResponse ->
                     when(detailResponse){
                         is ApiResponse.Empty -> emit(ApiResponse.Empty)
                         is ApiResponse.Error -> emit(ApiResponse.Error(detailResponse.errorMessage))

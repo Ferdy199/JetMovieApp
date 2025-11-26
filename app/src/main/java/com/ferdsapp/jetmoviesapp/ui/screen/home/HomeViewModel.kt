@@ -47,9 +47,9 @@ class HomeViewModel @Inject constructor(private val repository: IMovieRepository
         )
 
 
-    fun movieDetail(movieId: Int)  {
+    fun movieDetail(media_type: String,movieId: Int)  {
         viewModelScope.launch {
-            repository.getMovieDetail(movieId)
+            repository.getMovieDetail(media_type,movieId)
                 .asUiState()
                 .collect { state ->
                     _movieDetailState.value = state

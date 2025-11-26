@@ -112,7 +112,7 @@ fun NowPlayingSection(
                         backdrop_path = movie.backdrop_path ?: "",
                         title = movie.title,
                         modifier = Modifier.clickable {
-                            viewModel.movieDetail(movie.id)
+                            viewModel.movieDetail("movie",movie.id)
                         }
                     )
                 }

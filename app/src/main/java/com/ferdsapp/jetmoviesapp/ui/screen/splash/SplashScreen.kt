@@ -47,7 +47,7 @@ fun SplashScreen(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(180.dp)
+            modifier = Modifier.size(240.dp)
         )
     }
 }

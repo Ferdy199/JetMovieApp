@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailGenre
 import com.ferdsapp.jetmoviesapp.ui.navigation.Screen
 import com.ferdsapp.jetmoviesapp.ui.screen.components.BottomBar
 import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieTopAppBar
@@ -80,11 +81,15 @@ fun MovieApp(
                 val movieBackground = it.arguments?.getString("movieBackground") ?: ""
 
                 DetailScreen(
-                    movieId = id,
                     movieTitle = title,
                     overview = overview,
                     moviePoster = moviePoster,
                     movieBackground = movieBackground,
+                    listGenre = listOf(
+                        MovieDetailGenre(1, "Fiction"),
+                        MovieDetailGenre(2, "romance"),
+                        MovieDetailGenre(3, "War")
+                    ),
                     navigateBack = {
                         navController.navigateUp()
                     }
