@@ -93,7 +93,7 @@ class RemoteDataSource @Inject constructor (
             emit(ApiResponse.Loading)
             try {
                 val token = BuildConfig.API_TOKEN
-                val responses = apiService.getMovieDetail(token, idMovie)
+                val responses = apiService.getMovieDetail("Bearer $token", idMovie)
                 emit(ApiResponse.Success(responses))
             }catch (e: Exception){
                 emit(ApiResponse.Error(e.message ?: "Unexpected error"))

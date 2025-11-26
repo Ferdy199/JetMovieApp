@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.repository
 
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
@@ -85,6 +86,25 @@ class JetMovieRepository @Inject constructor(
                         is ApiResponse.Error -> emit(ApiResponse.Error(searchResponses.errorMessage))
                         is ApiResponse.Loading -> emit(ApiResponse.Loading)
                         is ApiResponse.Success -> emit(ApiResponse.Success(searchResponses.data))
+                    }
+                }
+            }catch (e: Exception){
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+        }
+    }
+
+    override fun getMovieDetail(movieId: Int): Flow<ApiResponse<MovieDetailResponse>> {
+        return flow {
+            try {
+                remoteDataSource.movieDetail(movieId).collect { detailResponse ->
+                    when(detailResponse){
+                        is ApiResponse.Empty -> emit(ApiResponse.Empty)
+                        is ApiResponse.Error -> emit(ApiResponse.Error(detailResponse.errorMessage))
+                        is ApiResponse.Loading -> emit(ApiResponse.Loading)
+                        is ApiResponse.Success -> {
+                            emit(ApiResponse.Success(detailResponse.data))
+                        }
                     }
                 }
             }catch (e: Exception){

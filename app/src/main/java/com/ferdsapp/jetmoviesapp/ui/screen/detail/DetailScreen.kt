@@ -13,14 +13,18 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 fun DetailScreen(
     movieId: Int,
     movieTitle: String,
+    overview: String,
+    moviePoster: String,
+    movieBackground: String,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Detail Screen $movieId $movieTitle"
+            text = "Detail Screen $movieId $movieTitle $overview $moviePoster $movieBackground"
         )
     }
 }
@@ -29,6 +33,6 @@ fun DetailScreen(
 @Composable
 private fun DetailScreenPreview() {
     JetMoviesAppTheme {
-        DetailScreen(movieId = 0, "")
+        DetailScreen(movieId = 0, "", "", "", "", {})
     }
 }

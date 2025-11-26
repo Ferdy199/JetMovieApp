@@ -7,15 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
 import com.ferdsapp.jetmoviesapp.data.upcoming.UpcomingResponses
@@ -39,17 +39,18 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToDetail: (Int) -> Unit
+    navigateToDetail: (Int, String, String, String, String) -> Unit
     ) {
 
 
     val movieState by viewModel.movieUiState.collectAsStateWithLifecycle()
     val tvState by viewModel.tvUiState.collectAsStateWithLifecycle()
     val upcomingState by viewModel.upComingState.collectAsStateWithLifecycle()
+    val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
 
-    val isLoading = remember(movieState, tvState, upcomingState) {
+    val isLoading = remember(movieState, tvState, upcomingState, movieDetailState) {
         derivedStateOf {
-            movieState == UiState.Loading || tvState == UiState.Loading || upcomingState == UiState.Loading
+            movieState == UiState.Loading || tvState == UiState.Loading || upcomingState == UiState.Loading || movieDetailState == UiState.Loading
         }
     }
 
@@ -66,6 +67,7 @@ fun HomeScreen(
         ) {
             NowPlayingSection(
                 movieState,
+                movieDetailState = movieDetailState,
                 modifier = modifier,
                 navigateToDetail = navigateToDetail
             )
@@ -81,15 +83,17 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     JetMoviesAppTheme {
-        HomeScreen(navigateToDetail = {})
+        HomeScreen(navigateToDetail = {_,_,_,_,_ ->})
     }
 }
 
 @Composable
 fun NowPlayingSection(
     state:  UiState<List<ResultItem>>,
+    movieDetailState: UiState<MovieDetailResponse>,
     modifier: Modifier = Modifier,
-    navigateToDetail: (Int) -> Unit
+    navigateToDetail: (Int, String, String, String, String) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     when(state){
         is UiState.Error -> {
@@ -108,7 +112,7 @@ fun NowPlayingSection(
                         backdrop_path = movie.backdrop_path ?: "",
                         title = movie.title,
                         modifier = Modifier.clickable {
-                            navigateToDetail(movie.id)
+                            viewModel.movieDetail(movie.id)
                         }
                     )
                 }
@@ -116,6 +120,20 @@ fun NowPlayingSection(
         }
 
         UiState.Empty -> ErrorDialog()
+    }
+
+    LaunchedEffect(movieDetailState) {
+        if (movieDetailState is UiState.Success){
+            val detailData = movieDetailState.data
+            viewModel.clearMovieDetail()
+            navigateToDetail(
+                detailData.id,
+                detailData.original_title ?: "",
+                detailData.overview ?: "",
+                detailData.poster_path ?: "",
+                detailData.backdrop_path ?: ""
+            )
+        }
     }
 }
 

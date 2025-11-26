@@ -1,5 +1,6 @@
 package com.ferdsapp.jetmoviesapp.repository
 
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
@@ -13,4 +14,5 @@ interface IMovieRepository {
     fun getTvAiringToday(): Flow<ApiResponse<List<TvResultItem>>>
     fun getUpcomingMovie(): Flow<ApiResponse<UpcomingResponses>>
     fun getSearchResponses(query: String): Flow<ApiResponse<SearchResponses>>
+    fun getMovieDetail(movieId: Int): Flow<ApiResponse<MovieDetailResponse>>
 }
