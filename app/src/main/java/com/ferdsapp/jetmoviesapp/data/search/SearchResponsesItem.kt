@@ -13,7 +13,13 @@ data class SearchResponsesItem(
     var id: Int = 0,
 
     @field:SerializedName("original_title")
-    var original_title: String = "",
+    var original_title: String?,
+
+    @field:SerializedName("original_name")
+    var original_name: String?,
+
+    @field:SerializedName("name")
+    var name: String?,
 
     @field:SerializedName("poster_path")
     var poster_path: String = "",

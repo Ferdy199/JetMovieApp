@@ -71,6 +71,7 @@ dependencies {
     implementation (libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.coil.compose)
+    implementation(libs.lottie.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
