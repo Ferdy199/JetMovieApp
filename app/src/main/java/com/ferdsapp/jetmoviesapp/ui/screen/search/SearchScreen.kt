@@ -1,6 +1,7 @@
 package com.ferdsapp.jetmoviesapp.ui.screen.search
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
@@ -15,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.ui.screen.components.EmptyDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.ErrorDialog
@@ -27,13 +30,15 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = hiltViewModel()
+    viewModel: SearchViewModel = hiltViewModel(),
+    navigateToDetail: (Int, String, String, String, String) -> Unit
 ) {
     Column(
         modifier = modifier,
     ) {
         val query by viewModel.query.collectAsStateWithLifecycle()
         val state by viewModel.searchState.collectAsStateWithLifecycle()
+        val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
 
         SearchBarApp(
             query = query,
@@ -65,19 +70,28 @@ fun SearchScreen(
                     items(searchResponses.results, key = {it.id}) { searchResponses ->
                         MovieItem(
                             backdrop_path = searchResponses.poster_path,
-                            title = searchResponses.original_title ?: searchResponses.name ?: searchResponses.original_name ?: "-"
+                            title = searchResponses.original_title ?: searchResponses.name ?: searchResponses.original_name ?: "-",
+                            modifier = Modifier.clickable{
+                                viewModel.movieDetail(searchResponses.media_type, searchResponses.id)
+                            }
                         )
                     }
                 }
             }
         }
-    }
-}
 
-@Preview(showBackground = true, showSystemUi = true, device = PIXEL_3)
-@Composable
-private fun SearchScreenPreview() {
-    JetMoviesAppTheme {
-        SearchScreen()
+        LaunchedEffect(movieDetailState) {
+            if (movieDetailState is UiState.Success){
+                val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
+                viewModel.clearMovieDetail()
+                navigateToDetail(
+                    detailData.id,
+                    detailData.original_title ?: "",
+                    detailData.overview ?: "",
+                    detailData.poster_path ?: "",
+                    detailData.backdrop_path ?: ""
+                )
+            }
+        }
     }
 }

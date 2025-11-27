@@ -2,6 +2,7 @@ package com.ferdsapp.jetmoviesapp.ui.screen.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.helper.UiStateHelper.asUiState
 import com.ferdsapp.jetmoviesapp.repository.IMovieRepository
@@ -9,7 +10,6 @@ import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,13 +19,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(val repository: IMovieRepository): ViewModel() {
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
+
+    private val _movieDetailState = MutableStateFlow<UiState<MovieDetailResponse>>(UiState.Empty)
+    val movieDetailState = _movieDetailState
 
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -53,6 +56,20 @@ class SearchViewModel @Inject constructor(val repository: IMovieRepository): Vie
 
     fun searchNow(query: String){
         _query.value = query
+    }
+
+    fun movieDetail(media_type: String, movieId: Int){
+        viewModelScope.launch {
+            repository.getMovieDetail(media_type, movieId)
+                .asUiState()
+                .collect { state ->
+                    _movieDetailState.value = state
+                }
+        }
+    }
+
+    fun clearMovieDetail(){
+        _movieDetailState.value = UiState.Empty
     }
 
 }

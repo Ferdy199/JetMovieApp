@@ -58,7 +58,11 @@ fun MovieApp(
             }
 
             composable(Screen.Search.route){
-                SearchScreen()
+                SearchScreen(
+                    navigateToDetail = { movieId, movieTitle, movieOverview, moviePoster, movieBackground ->
+                        navController.navigate(Screen.DetailMovie.createRoute(movieId, movieTitle, movieOverview, moviePoster, movieBackground))
+                    }
+                )
             }
 
             composable(Screen.Favorite.route){
