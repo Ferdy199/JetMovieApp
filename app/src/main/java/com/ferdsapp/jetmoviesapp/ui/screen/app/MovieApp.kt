@@ -23,6 +23,7 @@ import com.ferdsapp.jetmoviesapp.ui.screen.favorite.FavoriteScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.home.HomeScreen
 import com.ferdsapp.jetmoviesapp.ui.screen.search.SearchScreen
 import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
+import com.google.gson.Gson
 
 @Composable
 fun MovieApp(
@@ -51,16 +52,16 @@ fun MovieApp(
         ){
             composable(Screen.Home.route) {
                 HomeScreen(
-                    navigateToDetail = { movieId, movieTitle, movieOverview, moviePoster, movieBackground ->
-                        navController.navigate(Screen.DetailMovie.createRoute(movieId, movieTitle, movieOverview, moviePoster, movieBackground))
+                    navigateToDetail = { movieId, movieTitle, movieOverview, movieGenre,moviePoster, movieBackground ->
+                        navController.navigate(Screen.DetailMovie.createRoute(movieId, movieTitle, movieOverview, moviePoster, movieBackground, movieGenre))
                     }
                 )
             }
 
             composable(Screen.Search.route){
                 SearchScreen(
-                    navigateToDetail = { movieId, movieTitle, movieOverview, moviePoster, movieBackground ->
-                        navController.navigate(Screen.DetailMovie.createRoute(movieId, movieTitle, movieOverview, moviePoster, movieBackground))
+                    navigateToDetail = { movieId, movieTitle, movieOverview, movieGenre,moviePoster, movieBackground ->
+                        navController.navigate(Screen.DetailMovie.createRoute(movieId, movieTitle, movieOverview, moviePoster, movieBackground, movieGenre))
                     }
                 )
             }
@@ -75,7 +76,8 @@ fun MovieApp(
                     navArgument("movieTitle"){type = NavType.StringType},
                     navArgument("movieOverview"){type = NavType.StringType},
                     navArgument("moviePoster"){type = NavType.StringType},
-                    navArgument("movieBackground"){type = NavType.StringType}
+                    navArgument("movieBackground"){type = NavType.StringType},
+                    navArgument("movieGenre"){type = NavType.StringType}
                     )
             ){
                 val id = it.arguments?.getInt("movieId") ?: -1
@@ -84,16 +86,16 @@ fun MovieApp(
                 val moviePoster = it.arguments?.getString("moviePoster") ?: ""
                 val movieBackground = it.arguments?.getString("movieBackground") ?: ""
 
+                val genreJson = it.arguments?.getString("movieGenre") ?: ""
+                val movieGenre = Gson().fromJson(genreJson, Array<MovieDetailGenre>::class.java).toList()
+
                 DetailScreen(
+                    id = id,
                     movieTitle = title,
                     overview = overview,
                     moviePoster = moviePoster,
                     movieBackground = movieBackground,
-                    listGenre = listOf(
-                        MovieDetailGenre(1, "Fiction"),
-                        MovieDetailGenre(2, "romance"),
-                        MovieDetailGenre(3, "War")
-                    ),
+                    listGenre = movieGenre,
                     navigateBack = {
                         navController.navigateUp()
                     }

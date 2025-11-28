@@ -2,6 +2,7 @@ package com.ferdsapp.jetmoviesapp.ui.screen.search
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -10,13 +11,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_3
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailGenre
 import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.search.SearchResponses
 import com.ferdsapp.jetmoviesapp.ui.screen.components.EmptyDialog
@@ -31,7 +35,7 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 fun SearchScreen(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
-    navigateToDetail: (Int, String, String, String, String) -> Unit
+    navigateToDetail: (Int, String, String, List<MovieDetailGenre>, String, String) -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -39,6 +43,32 @@ fun SearchScreen(
         val query by viewModel.query.collectAsStateWithLifecycle()
         val state by viewModel.searchState.collectAsStateWithLifecycle()
         val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
+
+        val isLoading = remember( movieDetailState) {
+            derivedStateOf {
+                movieDetailState == UiState.Loading
+            }
+        }
+
+        if (isLoading.value){
+            LoadingDialog()
+        }
+
+
+        LaunchedEffect(movieDetailState) {
+            if (movieDetailState is UiState.Success){
+                val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
+                viewModel.clearMovieDetail()
+                navigateToDetail(
+                    detailData.id,
+                    detailData.original_title ?: "",
+                    detailData.overview ?: "",
+                    detailData.genres ?: listOf(),
+                    detailData.poster_path ?: "",
+                    detailData.backdrop_path ?: "",
+                )
+            }
+        }
 
         SearchBarApp(
             query = query,
@@ -65,6 +95,7 @@ fun SearchScreen(
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                 ) {
                     items(searchResponses.results, key = {it.id}) { searchResponses ->
@@ -77,20 +108,6 @@ fun SearchScreen(
                         )
                     }
                 }
-            }
-        }
-
-        LaunchedEffect(movieDetailState) {
-            if (movieDetailState is UiState.Success){
-                val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
-                viewModel.clearMovieDetail()
-                navigateToDetail(
-                    detailData.id,
-                    detailData.original_title ?: "",
-                    detailData.overview ?: "",
-                    detailData.poster_path ?: "",
-                    detailData.backdrop_path ?: ""
-                )
             }
         }
     }

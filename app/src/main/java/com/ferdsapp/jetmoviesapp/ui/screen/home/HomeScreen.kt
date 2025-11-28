@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailGenre
 import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
@@ -40,7 +40,7 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    navigateToDetail: (Int, String, String, String, String) -> Unit
+    navigateToDetail: (Int, String, String, List<MovieDetailGenre>, String, String) -> Unit
     ) {
 
     val movieState by viewModel.movieUiState.collectAsStateWithLifecycle()
@@ -57,6 +57,21 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(movieDetailState) {
+        if (movieDetailState is UiState.Success){
+            val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
+            viewModel.clearMovieDetail()
+            navigateToDetail(
+                detailData.id,
+                detailData.original_title ?: "",
+                detailData.overview ?: "",
+                detailData.genres ?: listOf() ,
+                detailData.poster_path ?: "",
+                detailData.backdrop_path ?: "",
+            )
+        }
+    }
+
     Box(
         modifier = Modifier
     ) {
@@ -70,21 +85,18 @@ fun HomeScreen(
         ) {
             NowPlayingSection(
                 movieState,
-                movieDetailState = movieDetailState,
                 modifier = modifier,
-                navigateToDetail = navigateToDetail
+                viewModel = viewModel
             )
             NowAiringSection(
                 state = tvState,
                 modifier = modifier,
-                tvDetailState = movieDetailState,
-                navigateToDetail = navigateToDetail
+                viewModel = viewModel
             )
             UpcomingMovieSection(
                 state = upcomingState,
-                upComingDetailState = movieDetailState,
-                navigateToDetail = navigateToDetail,
                 modifier = modifier,
+                viewModel = viewModel
             )
         }
 
@@ -96,17 +108,15 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPreview() {
     JetMoviesAppTheme {
-        HomeScreen(navigateToDetail = {_,_,_,_,_ ->})
+        HomeScreen(navigateToDetail = {_,_,_,_,_,_ ->})
     }
 }
 
 @Composable
 fun NowPlayingSection(
     state:  UiState<List<ResultItem>>,
-    movieDetailState: UiState<MovieDetailResponse>,
     modifier: Modifier = Modifier,
-    navigateToDetail: (Int, String, String, String, String) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel
 ) {
     when(state){
         is UiState.Error -> {
@@ -135,30 +145,14 @@ fun NowPlayingSection(
         UiState.Empty -> ErrorDialog()
     }
 
-    LaunchedEffect(movieDetailState) {
-        if (movieDetailState is UiState.Success){
-            val detailData = movieDetailState.data
-            viewModel.clearMovieDetail()
-            navigateToDetail(
-                detailData.id,
-                detailData.original_title ?: "",
-                detailData.overview ?: "",
-                detailData.poster_path ?: "",
-                detailData.backdrop_path ?: ""
-            )
-        }
-    }
 }
 
 @Composable
 fun NowAiringSection(
     state:  UiState<List<TvResultItem>>,
-    tvDetailState: UiState<MovieDetailResponse>,
-    navigateToDetail: (Int, String, String, String, String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel
 ) {
-    var tempData: TvResultItem? = null
     when(state){
         is UiState.Error -> {
             ErrorDialog(modifier)
@@ -172,7 +166,6 @@ fun NowAiringSection(
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 items(data, key =  {it.id}) { tv ->
-                    tempData = tv
                     MovieItem(
                         backdrop_path = tv.poster_path,
                         title = tv.original_name,
@@ -185,28 +178,12 @@ fun NowAiringSection(
         }
         UiState.Empty -> ErrorDialog()
     }
-
-    LaunchedEffect(tvDetailState) {
-        if (tvDetailState is UiState.Success){
-            val detailData = tvDetailState.data
-            viewModel.clearMovieDetail()
-            navigateToDetail(
-                detailData.id,
-                detailData.original_title ?: tempData?.original_name ?: "",
-                detailData.overview ?: "",
-                detailData.poster_path ?: "",
-                detailData.backdrop_path ?: ""
-            )
-        }
-    }
 }
 
 @Composable
 fun UpcomingMovieSection(
     state:  UiState<UpcomingResponses>,
-    upComingDetailState: UiState<MovieDetailResponse>,
-    navigateToDetail: (Int, String, String, String, String) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel,
     modifier: Modifier = Modifier
 ) {
     when(state){
@@ -227,9 +204,11 @@ fun UpcomingMovieSection(
                     UpComingItem(
                         releasedDate = responsesData.dates,
                         upcomingResults = upcoming,
-                        order = (index + 1).toString()
+                        order = (index + 1).toString(),
+                        modifier = Modifier.clickable{
+                            viewModel.movieDetail("movie", upcoming.id)
+                        }
                     )
-                    // spacing antar item
                     if (index < responsesData.results.lastIndex) {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -237,18 +216,5 @@ fun UpcomingMovieSection(
             }
         }
         UiState.Empty -> ErrorDialog()
-    }
-
-    LaunchedEffect(upComingDetailState) {
-        if (upComingDetailState is UiState.Success){
-            val detailData = upComingDetailState.data
-            navigateToDetail(
-                detailData.id,
-                detailData.original_title ?: "",
-                detailData.overview ?: "",
-                detailData.poster_path ?: "",
-                detailData.backdrop_path ?: ""
-            )
-        }
     }
 }

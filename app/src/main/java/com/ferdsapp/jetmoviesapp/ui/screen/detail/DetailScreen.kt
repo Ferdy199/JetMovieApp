@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +38,7 @@ import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 
 @Composable
 fun DetailScreen(
+    id: Int,
     movieTitle: String,
     overview: String,
     moviePoster: String,
@@ -47,6 +49,7 @@ fun DetailScreen(
 ) {
     Column(
         modifier = modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ){
         AsyncImage(
             model = "https://image.tmdb.org/t/p/w500${movieBackground}",
@@ -77,38 +80,45 @@ fun DetailScreen(
             Column {
                 Text(
                     text = movieTitle,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.W600,
-                    fontFamily = FontFamily.SansSerif
+                    fontFamily = FontFamily.SansSerif,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(80.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
+                    modifier = Modifier.heightIn(max = 160.dp)
                 ) {
                     items(listGenre, key = {it.id}){ genreList ->
                         GenreItem(genreList.name)
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Overview",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.W600,
-                    fontFamily = FontFamily.SansSerif
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = overview,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.W300,
-                    fontFamily = FontFamily.SansSerif,
-                    textAlign = TextAlign.Justify,
-                )
             }
 
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 8.dp, bottom = 16.dp)
+        ) {
+            Text(
+                text = "Overview",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.W600,
+                fontFamily = FontFamily.SansSerif
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = overview,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.W200,
+                fontFamily = FontFamily.SansSerif,
+                textAlign = TextAlign.Justify,
+            )
         }
     }
 }
@@ -118,6 +128,7 @@ fun DetailScreen(
 private fun DetailScreenPreview() {
     JetMoviesAppTheme {
         DetailScreen(
+            1,
             "Panda",
             "Relaxed pacifist, matcha addict, and convinced vegan, Panda runs a small shack in a remote corner of the Camargue. No phone, no computer, no car; he lives with his 16-year-old in this perfect cocoon of peace and serenity, avoiding anything resembling conflict. How to imagine that this wise man in flip-flops and a faded t-shirt was once a cop? And not just any cop. One of the best. Unfortunately, even in paradise, there's no way to be completely peaceful. When his former life comes knocking at the door, Panda finds himself obliged to return to duty... But in his own way. Without weapons or violence and not too early in the morning. Zen, you know.",
             "",
