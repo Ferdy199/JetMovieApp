@@ -50,10 +50,6 @@ fun SearchScreen(
             }
         }
 
-        if (isLoading.value){
-            LoadingDialog()
-        }
-
 
         LaunchedEffect(movieDetailState) {
             if (movieDetailState is UiState.Success){
@@ -91,6 +87,10 @@ fun SearchScreen(
             is UiState.Success-> {
                 val searchResponses = (state as UiState.Success<SearchResponses>).data
                 Log.d("SearchResult", "SearchScreen: ${searchResponses.results}")
+
+                if (isLoading.value){
+                    LoadingDialog()
+                }
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),

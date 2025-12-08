@@ -41,7 +41,7 @@ fun LoadingDialog(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun LoadingDialogPreview() {
     JetMoviesAppTheme {
@@ -78,7 +78,7 @@ fun ErrorDialog(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ErrorDialogPreview() {
     JetMoviesAppTheme {

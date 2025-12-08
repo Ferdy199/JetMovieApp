@@ -7,17 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,14 +29,17 @@ import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailResponse
 import com.ferdsapp.jetmoviesapp.data.movie.ResultItem
 import com.ferdsapp.jetmoviesapp.data.tv.TvResultItem
 import com.ferdsapp.jetmoviesapp.data.upcoming.UpcomingResponses
+import com.ferdsapp.jetmoviesapp.ui.screen.components.EmptyDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.ErrorDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.LoadingDialog
 import com.ferdsapp.jetmoviesapp.ui.screen.components.MovieItem
+import com.ferdsapp.jetmoviesapp.ui.screen.components.PullToRefresh
 import com.ferdsapp.jetmoviesapp.ui.screen.components.SectionText
 import com.ferdsapp.jetmoviesapp.ui.screen.components.UpComingItem
 import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -43,65 +47,93 @@ fun HomeScreen(
     navigateToDetail: (Int, String, String, List<MovieDetailGenre>, String, String) -> Unit
     ) {
 
-    val movieState by viewModel.movieUiState.collectAsStateWithLifecycle()
-    val tvState by viewModel.tvUiState.collectAsStateWithLifecycle()
-    val upcomingState by viewModel.upComingState.collectAsStateWithLifecycle()
-    val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
+    val refreshState by viewModel.refreshState.collectAsStateWithLifecycle()
 
-    val isLoading = remember(movieState, tvState, upcomingState, movieDetailState) {
-        derivedStateOf {
-            movieState == UiState.Loading ||
-                    tvState == UiState.Loading ||
-                    upcomingState == UiState.Loading ||
-                    movieDetailState == UiState.Loading
-        }
-    }
-
-    LaunchedEffect(movieDetailState) {
-        if (movieDetailState is UiState.Success){
-            val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
-            viewModel.clearMovieDetail()
-            navigateToDetail(
-                detailData.id,
-                detailData.original_title ?: "",
-                detailData.overview ?: "",
-                detailData.genres ?: listOf() ,
-                detailData.poster_path ?: "",
-                detailData.backdrop_path ?: "",
-            )
-        }
-    }
-
-    Box(
+    PullToRefresh(
+        isRefreshing = refreshState,
+        onRefresh = viewModel::refreshScreen,
         modifier = Modifier
     ) {
+        val movieState by viewModel.movieUiState.collectAsStateWithLifecycle()
+        val tvState by viewModel.tvUiState.collectAsStateWithLifecycle()
+        val upcomingState by viewModel.upComingState.collectAsStateWithLifecycle()
+        val movieDetailState by viewModel.movieDetailState.collectAsStateWithLifecycle()
 
-        if (isLoading.value){
-            LoadingDialog()
+        val isLoading by derivedStateOf {
+            movieState is UiState.Loading ||
+                    tvState is UiState.Loading ||
+                    upcomingState is UiState.Loading ||
+                    movieDetailState is UiState.Loading
         }
 
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+        val isEmpty by derivedStateOf {
+            movieState is UiState.Empty &&
+                    tvState is UiState.Empty &&
+                    upcomingState is UiState.Empty &&
+                    movieDetailState is UiState.Empty
+        }
+
+        val isError by derivedStateOf {
+            movieState is UiState.Error ||
+                    tvState is UiState.Error ||
+                    upcomingState is UiState.Error ||
+                    movieDetailState is UiState.Error
+        }
+
+
+        LaunchedEffect(movieDetailState) {
+            if (movieDetailState is UiState.Success){
+                val detailData = (movieDetailState as UiState.Success<MovieDetailResponse>).data
+                viewModel.clearMovieDetail()
+                navigateToDetail(
+                    detailData.id,
+                    detailData.original_title ?: detailData.original_name ?: "what if",
+                    detailData.overview ?: "",
+                    detailData.genres ?: listOf() ,
+                    detailData.poster_path ?: "",
+                    detailData.backdrop_path ?: "",
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            NowPlayingSection(
-                movieState,
-                modifier = modifier,
-                viewModel = viewModel
-            )
-            NowAiringSection(
-                state = tvState,
-                modifier = modifier,
-                viewModel = viewModel
-            )
-            UpcomingMovieSection(
-                state = upcomingState,
-                modifier = modifier,
-                viewModel = viewModel
-            )
+
+            when {
+                isLoading -> LoadingDialog(modifier)
+                isError -> ErrorDialog(modifier)
+                isEmpty -> EmptyDialog(modifier)
+            }
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                NowPlayingSection(
+                    movieState,
+                    modifier = modifier,
+                    viewModel = viewModel
+                )
+                NowAiringSection(
+                    state = tvState,
+                    modifier = modifier,
+                    viewModel = viewModel
+                )
+                UpcomingMovieSection(
+                    state = upcomingState,
+                    modifier = modifier,
+                    viewModel = viewModel
+                )
+                // penting: biar bisa ditarik walau konten sedikit/empty
+                Spacer(Modifier.height(300.dp))
+            }
+
         }
-
     }
-
 }
 
 @Preview
@@ -119,10 +151,8 @@ fun NowPlayingSection(
     viewModel: HomeViewModel
 ) {
     when(state){
-        is UiState.Error -> {
-            ErrorDialog(modifier)
-        }
-        UiState.Loading -> {}
+        is UiState.Error -> {}
+        is UiState.Loading -> {}
         is UiState.Success -> {
             val data = state.data
             SectionText("In Theaters")
@@ -142,7 +172,7 @@ fun NowPlayingSection(
             }
         }
 
-        UiState.Empty -> ErrorDialog()
+        UiState.Empty -> {}
     }
 
 }
@@ -154,9 +184,7 @@ fun NowAiringSection(
     viewModel: HomeViewModel
 ) {
     when(state){
-        is UiState.Error -> {
-            ErrorDialog(modifier)
-        }
+        is UiState.Error -> {}
         is UiState.Loading -> {}
         is UiState.Success -> {
             val data = state.data
@@ -176,7 +204,7 @@ fun NowAiringSection(
                 }
             }
         }
-        UiState.Empty -> ErrorDialog()
+        UiState.Empty -> {}
     }
 }
 
@@ -187,11 +215,7 @@ fun UpcomingMovieSection(
     modifier: Modifier = Modifier
 ) {
     when(state){
-        is UiState.Error -> {
-            ErrorDialog(
-                modifier = modifier
-            )
-        }
+        is UiState.Error -> {}
         is UiState.Loading -> {}
         is UiState.Success -> {
             val responsesData = state.data
@@ -215,6 +239,6 @@ fun UpcomingMovieSection(
                 }
             }
         }
-        UiState.Empty -> ErrorDialog()
+        UiState.Empty -> {}
     }
 }

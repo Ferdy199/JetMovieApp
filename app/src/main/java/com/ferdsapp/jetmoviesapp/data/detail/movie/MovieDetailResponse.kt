@@ -6,6 +6,9 @@ data class MovieDetailResponse(
     @SerializedName("original_title")
     var original_title: String?,
 
+    @SerializedName("original_name")
+    var original_name: String?,
+
     @SerializedName("overview")
     var overview: String?,
 

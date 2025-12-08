@@ -16,6 +16,6 @@ sealed class Screen(val route: String) {
             moviePoster: String,
             movieBackground: String,
             movieGenre: List<MovieDetailGenre>
-        ) = "home/$movieId/$movieTitle/$movieOverview/${Uri.encode(Gson().toJson(movieGenre))}/${Uri.encode(moviePoster)}/${Uri.encode(movieBackground)}"
+        ) = "home/$movieId/$movieTitle/${Uri.encode(movieOverview)}/${Uri.encode(Gson().toJson(movieGenre))}/${Uri.encode(moviePoster)}/${Uri.encode(movieBackground)}"
     }
 }
