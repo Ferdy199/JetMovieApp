@@ -17,11 +17,22 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,11 +41,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ferdsapp.jetmoviesapp.R
 import com.ferdsapp.jetmoviesapp.data.detail.movie.MovieDetailGenre
+import com.ferdsapp.jetmoviesapp.data.favorite.FavoriteMovie
 import com.ferdsapp.jetmoviesapp.ui.screen.components.GenreItem
+import com.ferdsapp.jetmoviesapp.ui.screen.state.UiState
 import com.ferdsapp.jetmoviesapp.ui.theme.JetMoviesAppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun DetailScreen(
@@ -45,10 +61,75 @@ fun DetailScreen(
     movieBackground: String,
     listGenre: List<MovieDetailGenre>,
     navigateBack: () -> Unit,
+    detailViewModel: DetailViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val state = detailViewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    Scaffold(
+        modifier = Modifier,
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                detailViewModel.addFavoriteMovie(
+                    FavoriteMovie(
+                        id,
+                        movieTitle,
+                        moviePoster
+                    )
+                )
+                state.value.let { uiState ->
+                    when(uiState){
+                        is UiState.Empty -> {}
+                        is UiState.Error -> {}
+                        is UiState.Loading -> {}
+                        is UiState.Success -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Berhasil menambahkan ke Favorite",
+                                    duration = SnackbarDuration.Short,
+                                )
+                            }
+                        }
+                    }
+                }
+
+            }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+            }
+        },
+        snackbarHost = {
+           SnackbarHost(snackbarHostState)
+        }
+    ) {
+        DetailScreenContent(
+            id,
+            movieTitle,
+            overview,
+            moviePoster,
+            movieBackground,
+            listGenre,
+            navigateBack,
+            modifier
+        )
+    }
+}
+
+@Composable
+fun DetailScreenContent(
+    id: Int,
+    movieTitle: String,
+    overview: String,
+    moviePoster: String,
+    movieBackground: String,
+    listGenre: List<MovieDetailGenre>,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ){
         AsyncImage(
@@ -56,8 +137,9 @@ fun DetailScreen(
             contentScale = ContentScale.Crop,
             error = painterResource(R.drawable.noimage),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(16f/9f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -65,7 +147,7 @@ fun DetailScreen(
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 8.dp),
 
-        ) {
+            ) {
             AsyncImage(
                 model = "https://image.tmdb.org/t/p/w500${moviePoster}",
                 contentScale = ContentScale.Crop,
@@ -73,7 +155,7 @@ fun DetailScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .heightIn(min = 180.dp, max = 240.dp)
-                    .aspectRatio(2f/3f)
+                    .aspectRatio(2f / 3f)
                     .clip(RoundedCornerShape(8.dp))
             )
             Spacer(modifier = Modifier.width(8.dp))
